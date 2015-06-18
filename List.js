@@ -1,11 +1,13 @@
 
-var Node = function(val, next) {
+function Node(val, next) {
     this.val  = val;
     this.next = next;
 }
 
-var List = function(vals) {
-    this.nodes = null;
+function List(vals) {
+    this.first = null;
+    this.last  = null;
+
     if (vals && vals.constructor === Array) {
         for (var i = vals.length; i >= 0; --i) {
             this.push(vals[i]);
@@ -14,24 +16,52 @@ var List = function(vals) {
 }
 
 List.prototype.isEmpty = function() {
-    return this.nodes === null;
+    return this.first === null && this.last === null;
 }
 
 List.prototype.push = function(val) {
-    this.nodes = new Node(val, this.nodes);
+    this.first = new Node(val, this.first);
+
+    // Fixup end pointer if we were empty
+    if (this.last === null) {
+        this.last = this.first;
+    }
+}
+
+List.prototype.pushBack = function(val) {
+    var next = new Node(val, null);
+
+    if (this.first === null && this.last === null) {
+        this.first = next;
+        this.last  = next;
+    } else {
+        this.last.next = next;
+        this.last      = next;
+    }
 }
 
 List.prototype.pop = function() {
-    if (this.nodes === null) {
+    if (this.first === null) {
         throw new Error("empty list");
     }
-    var val = this.nodes.val;
-    this.nodes = this.nodes.next;
+
+    var val    = this.first.val;
+    this.first = this.first.next;
+    this.last  = first === null ? null : this.last;
     return val;
 }
 
 List.prototype.forEach = function(f) {
-    var cur = this.nodes;
+    var cur = this.first;
+    while (cur !== null) {
+        f(cur.val);
+        cur = cur.next;
+    }
+}
+
+// Duplicate that we will use for benchmarking complex programs
+List.prototype.forEach2 = function(f) {
+    var cur = this.first;
     while (cur !== null) {
         f(cur.val);
         cur = cur.next;
@@ -39,23 +69,21 @@ List.prototype.forEach = function(f) {
 }
 
 List.prototype.mapInplace = function(f) {
-    var cur = this.nodes;
+    var cur = this.first;
     while (cur) {
         cur.val = f(cur.val);
         cur = cur.next;
     }
 }
 
-var __mapHelper = function(f, xs) {
-    return xs === null ? null : new Node(f(xs.val, __mapHelper(f, xs.next)));
-}
-
 List.prototype.map = function(f) {
-    return __mapHelper(f, this.nodes);
+    var retval = new List();
+    this.forEach(function(x) { retval.pushBack(f(x)); });
+    return retval;
 }
 
 List.prototype.foldl = function(f, z) {
-    var cur = this.nodes;
+    var cur = this.first;
     var acc = z;
     while (cur !== null) {
         acc = f(acc, cur.val);
@@ -66,35 +94,20 @@ List.prototype.foldl = function(f, z) {
 
 List.prototype.append = function(other) {
     var retval = new List();
-
-    if (this.isEmpty() && other.isEmpty()) {
-        return retval;
-    }
-
-    var cur      = new Node(null, null);
-    retval.nodes = cur;
-
-    var λ = function(x) {
-        cur.val  = x
-        cur.next = new Node(null, null);
-        cur      = cur.next;
-    };
-
+    var λ = retval.pushBack.bind(retval)
     this.forEach(λ);
     other.forEach(λ);
-
     return retval;
 }
 
-var example = new List();
+//var example = new List();
 
-for (var i = 9999; i >= 0; --i) {
-    example.push(i);
-}
+//for (var i = 0; i < 10000; ++i) {
+    //example.pushBack(i);
+//}
 
-var double = example.append(example);
+//var dub = example.append(example);
 
-console.log(example.foldl(function(a,b) {return a + b;}, 0));
-console.log(double.foldl(function(a,b) {return a + b;}, 0));
-
+//console.log(example.foldl(function(a,b) {return a + b;}, 0));
+//console.log(dub.foldl(function(a,b) {return a + b;}, 0));
 

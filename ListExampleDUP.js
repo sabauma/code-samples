@@ -1,29 +1,25 @@
 
+load("List.js");
+
 function benchmark(n, iters, f) {
-    var outer = [];
+    var outer = new List();
     for (var i = 0; i < n; i++) {
-        var inner = [];
+        var inner = new List();
         for (var j = 0; j < n; j++)
-            inner.push(Math.random() * 100);
-        outer.push(inner);
+            inner.pushBack(Math.random() * 100);
+        outer.pushBack(inner);
     }
+
     var start = Date.now();
     for (var i = 0; i < iters; i++)
         f(outer);
     return Date.now() - start;
 }
 
-
-Array.prototype.myForEach = function (f) {
-    for (var i = 0; i < this.length; i++) {
-        f(this[i]);
-    }
-}
-
 function doForEach(outer) {
     var max = -Infinity;
-    outer.myForEach(function (inner) {
-        inner.myForEach(function (v) {
+    outer.forEach(function (inner) {
+        inner.forEach2(function (v) {
             if (v > max)
                 max = v;
         });
