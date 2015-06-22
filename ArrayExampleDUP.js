@@ -19,10 +19,16 @@ Array.prototype.myForEach = function (f) {
     }
 }
 
+Array.prototype.myForEach2 = function (f) {
+    for (var i = 0; i < this.length; i++) {
+        f(this[i]);
+    }
+}
+
 function doForEach(outer) {
     var max = -Infinity;
     outer.myForEach(function (inner) {
-        inner.myForEach(function (v) {
+        inner.myForEach2(function (v) {
             if (v > max)
                 max = v;
         });
