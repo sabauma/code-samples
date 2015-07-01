@@ -1,10 +1,11 @@
 
 load("List.js");
+load("List2.js");
 
 function benchmark(n, iters, f) {
     var outer = new List();
     for (var i = 0; i < n; i++) {
-        var inner = new List();
+        var inner = new List2();
         for (var j = 0; j < n; j++)
             inner.pushBack(Math.random() * 100);
         outer.pushBack(inner);
@@ -19,7 +20,7 @@ function benchmark(n, iters, f) {
 function doForEach(outer) {
     var max = -Infinity;
     outer.forEach(function (inner) {
-        inner.forEach2(function (v) {
+        inner.forEach(function (v) {
             if (v > max)
                 max = v;
         });
