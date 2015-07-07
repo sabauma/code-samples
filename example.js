@@ -1,20 +1,21 @@
 
-function benchmark(n, iters, f) {
-    var a = [];
-    var b = []
-    for (var i = 0; i < n; i++) {
-        var v = Math.random() * 100;
-        a.push(v);
-        b.push(new Box(v));
-    }
-    var start = Date.now();
-    for (var i = 0; i < iters; i++)
-        f(a, b);
-    return Date.now() - start;
-}
-
 function Box(v) {
     this.value = v;
+}
+
+function benchmark(n, iters, f) {
+    var a = [];
+    for (var i = 0; i < n; i++) {
+        var v = Math.random() * 100.0;
+        a.push(new Box(v));
+    }
+
+    var c = new Box("Hello world");
+
+    var start = Date.now();
+    for (var i = 0; i < iters; i++)
+        f(a);
+    return Date.now() - start;
 }
 
 Array.prototype.myForEach = function (f) {
@@ -23,18 +24,13 @@ Array.prototype.myForEach = function (f) {
     }
 }
 
-function doForEach(a, b) {
+function doForEach(a) {
     var max = -Infinity;
-    a.myForEach(function (val) {
+    for (var i = 0; i < a.length; i++) {
+        var val = a[i].value;
         if (val > max)
             max = val;
-    });
-
-    var max2 = -Infinity;
-    b.myForEach(function (val) {
-        if (b.value > max2)
-            max2 = b.value;
-    });
+    }
 }
 
 console.log(benchmark(500, 50000, doForEach));
